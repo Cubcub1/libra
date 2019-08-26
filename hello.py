@@ -1,7 +1,9 @@
+import os
 from datetime import datetime
 
 from flask import Flask, request, make_response, redirect, abort, render_template, session, url_for, flash
 from flask_bootstrap import Bootstrap
+from flask_mail import Mail, Message
 from flask_migrate import Migrate, MigrateCommand
 from flask_moment import Moment
 from flask_script import Manager, Server, Shell
@@ -16,6 +18,14 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:LIUXIN123@127.0.0.1:3306/l
 app.config['SQLALCHEMY_COMMIT_ON_TEARDOWN'] = True
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 app.config['DEBUG'] = True
+app.config['MAIL_SERVER'] = 'smtp.163.com'
+app.config['MAIL_PORT'] = 25
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME')
+app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD')
+app.config['LIBRA_MAIL_SUBJECT_PREFIX'] = '[LIBRA]'
+app.config['LIBRA_MAIL_SENDER'] = 'libra Admin <lx_0308@163.com>'
+app.config['LIBRA_ADMIN'] = os.environ.get('LIBRA_ADMIN')
 
 manager = Manager(app)
 bootstrap = Bootstrap(app)
@@ -23,6 +33,15 @@ moment = Moment(app)
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 manager.add_command('db', MigrateCommand)
+mail = Mail(app)
+
+
+def send_email(to, subject, template, **kwargs):
+    msg = Message(app.config['LIBRA_MAIL_SUBJECT_PREFIX'] + subject, sender=app.config['LIBRA_MAIL_SENDER'],
+                  recipients=[to])
+    msg.body = render_template(template + '.txt', **kwargs)
+    msg.html = render_template(template + '.html', **kwargs)
+    mail.send(msg)
 
 
 class Role(db.Model):
@@ -67,6 +86,8 @@ def index():
             user = User(username=form.name.data)
             db.session.add(user)
             session['known'] = False
+            if app.config['LIBRA_ADMIN']:
+                send_email(app.config['LIBRA_ADMIN'], 'New User', 'mail/new_user', user=user)
         else:
             session['known'] = True
         session['name'] = form.name.data
