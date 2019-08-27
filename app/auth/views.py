@@ -1,5 +1,5 @@
 from flask import render_template, redirect, request, url_for, flash
-from flask_login import login_user
+from flask_login import login_user, logout_user, login_required
 
 from .forms import LoginForm
 from . import auth
@@ -16,3 +16,11 @@ def login():
             return redirect(url_for('main.index'))
         flash('无效的用户名或密码.')
     return render_template('auth/login.html', form=form)
+
+
+@auth.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    flash('您已经退出登录')
+    return redirect(url_for('main.index'))
