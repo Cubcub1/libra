@@ -3,7 +3,7 @@ from flask_login import login_user, logout_user, login_required, current_user
 
 from ..email import send_email
 from .. import db
-from .forms import LoginForm, RegistrationForm
+from .forms import LoginForm, RegistrationForm, ChangePasswordForm
 from . import auth
 from ..models import User
 
@@ -57,9 +57,8 @@ def confirm(token):
 
 @auth.before_app_request
 def before_request():
-    # import pdb;pdb.set_trace();
     if current_user.is_authenticated and not current_user.confirmed and request.endpoint[
-                                                                          :5] != 'auth.' and request.endpoint != 'static':
+                                                                        :5] != 'auth.' and request.endpoint != 'static':
         return redirect(url_for('auth.unconfirmed'))
 
 
@@ -77,3 +76,18 @@ def resend_confirmation():
     send_email(current_user.email, 'Confirm Your Account', 'auth/email/confirm', user=current_user, token=token)
     flash("新的验证邮件已经发送到您的邮箱了")
     return redirect(url_for('main.index'))
+
+
+@auth.route('/change-password', methods=['GET', 'POST'])
+@login_required
+def change_password():
+    form = ChangePasswordForm()
+    if form.validate_on_submit():
+        if current_user.verify_password(form.old_password.data):
+            current_user.password = form.password.data
+            db.session.add(current_user)
+            flash("您的密码已修改！")
+            return redirect(url_for('main.index'))
+        else:
+            flash("无效的密码！")
+    return render_template('auth/change_password.html', form=form)
