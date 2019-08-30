@@ -40,7 +40,7 @@ class PasswordResetRequestForm(FlaskForm):
     email = StringField('邮箱', validators=[DataRequired(), Length(1, 64), Email()])
     submit = SubmitField('重置密码')
 
-    def validata_email(self, field):
+    def validate_email(self, field):
         if User.query.filter_by(email=field.data).first() is None:
             raise ValidationError('邮箱不存在.')
 
