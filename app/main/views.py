@@ -3,9 +3,10 @@ from datetime import datetime
 from flask import session, current_app, redirect, url_for, render_template, abort, flash
 from flask_login import current_user, login_required
 
+from ..lib.qiniu_util import upload_qiniu
 from ..decorators import admin_required
 from ..email import send_email
-from ..models import User
+from ..models import User, Role
 from .forms import NameForm, EditProfileForm, EditProfileAdminForm
 from .. import db
 from . import main
@@ -43,12 +44,16 @@ def user(username):
 def edit_profile():
     form = EditProfileForm()
     if form.validate_on_submit():
+        avatar_data = form.avatar.data
+        file_name = upload_qiniu(avatar_data.read())
+        current_user.avatar_url = file_name
         current_user.name = form.name.data
         current_user.location = form.location.data
         current_user.about_me = form.about_me.data
         db.session.add(current_user)
         flash('你的信息已经更新了.')
         return redirect(url_for('.user', username=current_user.username))
+    form.avatar.data = current_user.avatar_url
     form.name.data = current_user.name
     form.location.data = current_user.location
     form.about_me.data = current_user.about_me
@@ -62,16 +67,21 @@ def edit_profile_admin(id):
     user = User.query.get_or_404(id)
     form = EditProfileAdminForm(user)
     if form.validate_on_submit():
-        current_user.email = form.email.data
-        current_user.username = form.username.data
-        current_user.confirmed = form.confirmed.data
-        current_user.role = form.role.data
-        current_user.name = form.name.data
-        current_user.location = form.location.data
-        current_user.about_me = form.about_me
+        avatar_data = form.avatar.data
+        # import pdb;pdb.set_trace()
+        file_name = upload_qiniu(avatar_data.read())
+        user.avatar_url = file_name
+        user.email = form.email.data
+        user.username = form.username.data
+        user.confirmed = form.confirmed.data
+        user.role = Role.query.get(form.role.data)
+        user.name = form.name.data
+        user.location = form.location.data
+        user.about_me = form.about_me.data
         db.session.add(current_user)
         flash('你的信息已经更新了.')
         return redirect(url_for('.user', username=current_user.username))
+    form.avatar.data = current_user.avatar_url
     form.email.data = user.email
     form.username.data = user.username
     form.confirmed.data = user.confirmed
