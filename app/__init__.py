@@ -3,6 +3,7 @@ from flask_bootstrap import Bootstrap
 from flask_login import LoginManager
 from flask_mail import Mail
 from flask_moment import Moment
+from flask_pagedown import PageDown
 from flask_sqlalchemy import SQLAlchemy
 
 from config import config
@@ -11,6 +12,7 @@ bootstrap = Bootstrap()
 mail = Mail()
 moment = Moment()
 db = SQLAlchemy()
+pagedown = PageDown()
 login_manager = LoginManager()
 # LoginManager对象的session_protection属性可以设为None 'basic' 'strong' 已提供不同的安全等级防止用户回话遭篡改，
 # 设为'strong'，flask-login会记录客户端ip地址和浏览器的用户代理信息，如果有移动就登出用户
@@ -28,6 +30,7 @@ def create_app(config_name):
     mail.init_app(app)
     moment.init_app(app)
     db.init_app(app)
+    pagedown.init_app(app)
 
     login_manager.init_app(app)
 

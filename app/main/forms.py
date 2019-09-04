@@ -1,3 +1,4 @@
+from flask_pagedown.fields import PageDownField
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileAllowed
 from wtforms import StringField, SubmitField, BooleanField, SelectField, TextAreaField, FileField
@@ -43,3 +44,8 @@ class EditProfileAdminForm(FlaskForm):
     def validate_username(self, field):
         if field.data != self.user.username and User.query.filter_by(username=field.data).first():
             raise ValueError('用户名已存在！')
+
+
+class PostForm(FlaskForm):
+    body = PageDownField("想要说点什么？", validators=[DataRequired()])
+    submit = SubmitField('发布')

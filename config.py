@@ -8,6 +8,7 @@ class Config:
     LIBRA_MAIL_SENDER = 'Libra Admin <lx_0308@163.com>'
     # 接受邮件的项目admin账号
     LIBRA_ADMIN = os.environ.get('LIBRA_ADMIN')
+    LIBRA_POSTS_PER_PAGE = 5
 
     @staticmethod
     def init_app(app):
