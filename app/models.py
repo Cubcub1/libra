@@ -64,6 +64,7 @@ class User(UserMixin, db.Model):
     last_seen = db.Column(db.DateTime(), default=datetime.utcnow())
     avatar_url = db.Column(db.String(128))
     role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
+    posts = db.relationship('Post', backref='author', lazy='dynamic')
 
     def __init__(self, **kwargs):
         super(User, self).__init__(**kwargs)
@@ -151,6 +152,14 @@ class User(UserMixin, db.Model):
 
     def __repr__(self):
         return '<User %r>' % self.username
+
+
+class Post(db.Model):
+    __tablename_ = 'posts'
+    id = db.Column(db.Integer, primary_key=True)
+    body = db.Column(db.text)
+    timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
+    author_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
 
 # 加载用户的回调函数接收以 Unicode 字符串形式表示的用户标识符。如果能找到用户,这
