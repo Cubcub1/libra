@@ -64,7 +64,7 @@
 
 {% block scripts %}
     {{ super() }}
-    {{ moment.include_moment() }}
+    {{ moment.include_moment(local_js="https://static.pdflibr.com/momentjs/moment.min.js") }}
     {{ moment.lang('es') }}
 {% endblock %}
 
