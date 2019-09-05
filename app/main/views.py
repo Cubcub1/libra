@@ -123,7 +123,7 @@ def edit(id):
         post.body = form.body.data
         db.session.add(post)
         flash("博客已经更新了!")
-        import pdb;pdb.set_trace()
+        # import pdb;pdb.set_trace()
         return redirect(url_for('.post', id=post.id))
     form.body.data = post.body
     return render_template('edit_post.html', form=form)

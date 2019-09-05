@@ -1,7 +1,9 @@
-.profile-thumbnail {
-    position: absolute;
+.profile-comment {
+    display: flex;
 }
-.profile-header {
-    min-height: 260px;
-    margin-left: 280px;
+.profile-content {
+    flex: 1;
+}
+.profile-button {
+    float: right;
 }
