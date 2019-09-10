@@ -8,7 +8,7 @@ ACCESS_KEY = os.environ.get('ACCESS_KEY')
 SECRET_KEY = os.environ.get('SECRET_KEY')
 BUCKET_NAME = 'libra_pic'
 EXPIRE = 3600
-BUCKET_NAME_URI = "http://px1h00469.bkt.clouddn.com/"
+BUCKET_NAME_URI = os.environ.get('BUCKET_NAME_URI')
 
 
 def upload_qiniu(data):
